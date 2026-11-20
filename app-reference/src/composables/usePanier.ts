@@ -2,11 +2,12 @@ import { ref, computed } from 'vue';
 
 // L'état est déclaré EN DEHORS de la fonction :
 // toutes les pages qui appellent usePanier() partagent le même panier.
-const lignes = ref([]); // [{ plat, quantite }]
+import type { Categorie, Commande, NouvelleCommande, Plat , LigneCommande, LignePanier} from '../types/gargote';
+const lignes = ref<LignePanier[]>([]); // [{ plat, quantite }]
 
 export function usePanier() {
-  function ajouter(plat) {
-    const ligne = lignes.value.find((l) => l.plat.id === plat.id);
+  function ajouter(plat : Plat) {
+    const ligne: LignePanier | undefined = lignes.value.find((l) => l.plat.id === plat.id);
     if (ligne) {
       ligne.quantite++;
     } else {
@@ -14,8 +15,8 @@ export function usePanier() {
     }
   }
 
-  function changerQuantite(platId, delta) {
-    const ligne = lignes.value.find((l) => l.plat.id === platId);
+  function changerQuantite(platId : number, delta : number) {
+    const ligne: LignePanier | undefined = lignes.value.find((l) => l.plat.id === platId);
     if (!ligne) return;
     ligne.quantite += delta;
     if (ligne.quantite <= 0) {
@@ -28,7 +29,7 @@ export function usePanier() {
   }
 
   const nombreArticles = computed(() => lignes.value.reduce((n, l) => n + l.quantite, 0));
-  const total = computed(() => lignes.value.reduce((t, l) => t + l.plat.prix * l.quantite, 0));
+  const total = computed(() => lignes.value.reduce((t, l) => t + Number(l.plat.prix) * l.quantite, 0));
 
   return { lignes, ajouter, changerQuantite, vider, nombreArticles, total };
 }

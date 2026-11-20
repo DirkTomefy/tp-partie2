@@ -15,7 +15,7 @@ export class ErreurApi extends Error {
   }
 }
 
-async function requete(chemin: string, options = {}) {
+async function requete<T>(chemin: string, options: RequestInit = {}): Promise<T>  {
   const reponse = await fetch(BASE_URL + chemin, {
     headers: { 'Content-Type': 'application/json' },
     ...options,
@@ -27,7 +27,7 @@ async function requete(chemin: string, options = {}) {
     const erreur = new ErreurApi(donnees?.message ?? `Erreur HTTP ${reponse.status}`, reponse.status, donnees?.erreurs ?? {});
     throw erreur;
   }
-  return donnees;
+  return donnees as T;
 }
 
 export default {
