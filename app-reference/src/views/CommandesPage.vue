@@ -41,11 +41,13 @@ import { ref } from 'vue';
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel,
   IonNote, IonBadge, IonText, IonSpinner, IonRefresher, IonRefresherContent, onIonViewWillEnter,
+  type RefresherCustomEvent,
 } from '@ionic/vue';
 import api from '@/services/api';
 import { formatAriary, formatDate } from '@/utils/format';
+import type { Commande } from '@/types/gargote';
 
-const commandes = ref([]);
+const commandes = ref<Commande[]>([]);
 const chargement = ref(false);
 
 async function charger() {
@@ -57,7 +59,7 @@ async function charger() {
   }
 }
 
-async function rafraichir(event) {
+async function rafraichir(event : RefresherCustomEvent) {
   await charger();
   event.target.complete();
 }

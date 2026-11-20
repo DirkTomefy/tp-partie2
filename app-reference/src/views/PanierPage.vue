@@ -68,7 +68,7 @@ import {
   alertController, toastController, loadingController, useIonRouter,
 } from '@ionic/vue';
 import { addCircleOutline, removeCircleOutline } from 'ionicons/icons';
-import api from '@/services/api';
+import api, { ErreurApi } from '@/services/api';
 import { formatAriary } from '@/utils/format';
 import { usePanier } from '@/composables/usePanier';
 
@@ -108,18 +108,23 @@ async function envoyer() {
     await afficherToast(`Commande n°${commande.id} envoyée`, 'success');
     ionRouter.navigate('/tabs/commandes', 'forward', 'replace');
   } catch (e) {
-    if (e.statut === 422 && e.details.table) {
-      erreurTable.value = e.details.table;
-    } else {
-      await afficherToast(e.message, 'danger');
+    if(e instanceof ErreurApi){
+      if (e.statut === 422 && e.details.table) {
+        erreurTable.value = e.details.table;
+      } else {
+        await afficherToast(e.message, 'danger');
+      }
+    }else{
+      await afficherToast('Erreur inconnue', 'danger');
     }
+  
   } finally {
     await chargement.dismiss();
     envoi.value = false;
   }
 }
 
-async function afficherToast(message, color) {
+async function afficherToast(message: string, color: string ) {
   const toast = await toastController.create({ message, color, duration: 2500, position: 'top' });
   await toast.present();
 }

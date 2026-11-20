@@ -31,23 +31,23 @@ async function requete<T>(chemin: string, options: RequestInit = {}): Promise<T>
 }
 
 export default {
-  getCategories() {
-    return requete('/categories');
+  getCategories() : Promise<Categorie[]> {
+    return requete<Categorie[]>('/categories');
   },
 
-  getPlats(categorieId : number | null = null) {
-    return requete(categorieId ? `/plats?categorie=${categorieId}` : '/plats');
+  getPlats(categorieId : string | null = null) :  Promise<Plat[]> {
+    return requete<Plat[]>(categorieId ? `/plats?categorie=${categorieId}` : '/plats');
   },
 
-  getPlat(id : number) {
-    return requete(`/plats/${id}`);
+  getPlat(id : number) : Promise<Plat> {
+    return requete<Plat>(`/plats/${id}`);
   },
 
-  getCommandes() {
-    return requete('/commandes');
+  getCommandes() : Promise<Commande[]> {
+    return requete<Commande[]>('/commandes');
   },
 
-  creerCommande(commande: NouvelleCommande) {
-    return requete('/commandes', { method: 'POST', body: JSON.stringify(commande) });
+  creerCommande(commande: NouvelleCommande) : Promise<Commande> {
+    return requete<Commande>('/commandes', { method: 'POST', body: JSON.stringify(commande) });
   },
 };

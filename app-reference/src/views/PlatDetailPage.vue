@@ -15,7 +15,7 @@
 
       <ion-card v-if="plat">
         <ion-card-header>
-          <ion-card-subtitle>{{ plat.categorie.nom }}</ion-card-subtitle>
+          <ion-card-subtitle>{{ plat.categorie?.nom }}</ion-card-subtitle>
           <ion-card-title>{{ plat.nom }}</ion-card-title>
         </ion-card-header>
         <ion-card-content>
@@ -29,7 +29,7 @@
         <ion-icon slot="start" :icon="cartOutline" />
         Ajouter au panier
       </ion-button>
-    <p v-if="riz">Avec du riz : {{ formatAriary(Number(plat.prix) + Number(riz.prix)) }}</p>
+    <p v-if="riz">Avec du riz : {{ formatAriary(Number(plat?.prix) + Number(riz.prix)) }}</p>
 
     </ion-content>
 
@@ -45,22 +45,23 @@ import {
   IonButton, IonIcon, IonSpinner, IonText, useIonRouter,
 } from '@ionic/vue';
 import { cartOutline } from 'ionicons/icons';
-import api from '@/services/api';
+import api, { ErreurApi } from '@/services/api';
 import { formatAriary } from '@/utils/format';
 import { usePanier } from '@/composables/usePanier';
+import type { Plat } from '@/types/gargote';
 
 const route = useRoute();
 const ionRouter = useIonRouter();
 const { ajouter } = usePanier();
 
-const plat = ref(null);
-const erreur = ref(null);
-const riz = ref(null);
+const plat = ref<Plat | null>(null);
+const erreur = ref<string | null>(null);
+const riz = ref<Plat | null>(null);
 
 
 onMounted(async () => {
   try {
-    plat.value = await api.getPlat(route.params.id);
+    plat.value = await api.getPlat(Number(route.params.id));
     console.log('Plat:',route.params.id, plat.value);
     riz.value = await api.getPlat(7);
     console.log('Riz:', riz.value);
@@ -68,7 +69,14 @@ onMounted(async () => {
 
   } catch (e) {
     console.error(e);
-    erreur.value = e.statut === 404 ? "Ce plat n'existe pas." : "Impossible de charger le plat.";
+    if(e instanceof ErreurApi && e.statut === 404){
+      erreur.value = "Plat introuvable";
+    }else if(e instanceof ErreurApi){
+      erreur.value = e.message;
+    }else{
+      erreur.value = "Erreur inconnue";
+    }
+
   }
 });
 

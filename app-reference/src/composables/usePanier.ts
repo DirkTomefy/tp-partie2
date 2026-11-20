@@ -6,12 +6,12 @@ import type { Categorie, Commande, NouvelleCommande, Plat , LigneCommande, Ligne
 const lignes = ref<LignePanier[]>([]); // [{ plat, quantite }]
 
 export function usePanier() {
-  function ajouter(plat : Plat) {
-    const ligne: LignePanier | undefined = lignes.value.find((l) => l.plat.id === plat.id);
+  function ajouter(plat : Plat|null) {
+    const ligne: LignePanier | undefined = lignes.value.find((l) => l.plat.id === plat?.id);
     if (ligne) {
       ligne.quantite++;
     } else {
-      lignes.value.push({ plat, quantite: 1 });
+      lignes.value.push({ plat: plat!, quantite: 1 });
     }
   }
 
